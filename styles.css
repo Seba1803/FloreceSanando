@@ -4,7 +4,7 @@ body {
     background-size: cover;
     background-attachment: fixed;
     position: relative;
-    overflow: hidden;
+    overflow: auto; /* Asegura que el contenido sea desplazable */
 }
 
 .scroll-to-top {
@@ -231,6 +231,41 @@ body {
     animation-name: bounceIn;
 }
 
+.animated-logo {
+    animation: float 3s ease-in-out infinite;
+}
+
+.animated-text {
+    animation: color-change 5s infinite;
+}
+
+@keyframes float {
+    0%, 100% {
+        transform: translateY(0);
+    }
+    50% {
+        transform: translateY(-10px);
+    }
+}
+
+@keyframes color-change {
+    0% {
+        color: #000;
+    }
+    25% {
+        color: #3498db;
+    }
+    50% {
+        color: #2ecc71;
+    }
+    75% {
+        color: #e74c3c;
+    }
+    100% {
+        color: #000;
+    }
+}
+
 /* Background Animation */
 @keyframes moveBackground {
     0% {
@@ -264,8 +299,64 @@ body::before {
     color: #007bff;
 }
 
+.manual-usuario ul, .manual-usuario ol {
+    margin-left: 20px;
+}
+
+.manual-usuario ul li, .manual-usuario ol li {
+    margin-bottom: 10px;
+}
+
 .manual-usuario img {
     max-width: 100%;
     height: auto;
     margin-bottom: 20px;
+}
+
+/* Media Queries */
+@media (max-width: 768px) {
+    .navbar-nav {
+        text-align: center;
+    }
+
+    .navbar-nav .nav-item {
+        margin-bottom: 10px;
+    }
+
+    .container {
+        padding: 0 15px;
+    }
+
+    .btn-menu {
+        font-size: 1rem;
+        padding: 8px 16px;
+    }
+}
+
+/* Ajustes adicionales para dispositivos móviles */
+@media (max-width: 576px) {
+    .navbar-brand {
+        font-size: 1.5rem;
+    }
+
+    .btn-menu {
+        font-size: 1rem;
+        padding: 8px 12px;
+    }
+
+    .manual-usuario {
+        padding: 10px;
+    }
+
+    .manual-usuario h1, .manual-usuario h2 {
+        font-size: 1.2rem;
+    }
+
+    .manual-usuario ul, .manual-usuario ol {
+        margin-left: 10px;
+    }
+
+    .manual-usuario ul li, .manual-usuario ol li {
+        margin-bottom: 5px;
+    }
 }

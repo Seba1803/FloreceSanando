@@ -425,15 +425,40 @@ function guardarPacienteEnLocalStorage(paciente) {
     localStorage.setItem('pacientes', JSON.stringify(pacientes));
 }
 
-document.getElementById('nuevoPaciente').addEventListener('click', mostrarFormulario);
-document.getElementById('pacientes').addEventListener('click', mostrarLista);
-document.getElementById('reportes').addEventListener('click', function(event) {
-    event.preventDefault();
-    mostrarListaReportes();
+function guardarPacienteEnBaseDeDatos(paciente) {
+    fetch('/api/pacientes', {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json'
+        },
+        body: JSON.stringify(paciente)
+    })
+    .then(response => response.json())
+    .then(data => {
+        console.log('Paciente guardado en la base de datos con ID:', data.id);
+    })
+    .catch(error => {
+        console.error('Error al guardar el paciente en la base de datos:', error);
+    });
+}
+
+document.addEventListener('DOMContentLoaded', function() {
+    document.getElementById('nuevoPaciente').addEventListener('click', mostrarFormulario);
+    document.getElementById('pacientes').addEventListener('click', mostrarLista);
+    document.getElementById('reportes').addEventListener('click', function(event) {
+        event.preventDefault();
+        mostrarListaReportes();
+    });
+    document.getElementById('pagos').addEventListener('click', mostrarListaPagos);
+    document.getElementById('manualUso').addEventListener('click', mostrarManualUsuario);
+    document.getElementById('logo').addEventListener('click', function(event) {
+        event.preventDefault();
+        mostrarMenuPrincipal();
+    });
+
+    // Aplicar configuración al cargar la página
+    aplicarConfiguracion();
 });
-document.getElementById('pagos').addEventListener('click', mostrarPagos);
-document.getElementById('configuracion').addEventListener('click', configuracion);
-document.getElementById('test').addEventListener('click', mostrarTest);
 
 function mostrarFormulario() {
     const contenidoPrincipal = document.getElementById("contenidoPrincipal");
@@ -878,6 +903,24 @@ function guardarPacienteEnLocalStorage(paciente) {
     pacientes.push(paciente);
     localStorage.setItem('pacientes', JSON.stringify(pacientes));
 }
+
+function guardarPacienteEnBaseDeDatos(paciente) {
+    fetch('/api/pacientes', {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json'
+        },
+        body: JSON.stringify(paciente)
+    })
+    .then(response => response.json())
+    .then(data => {
+        console.log('Paciente guardado en la base de datos con ID:', data.id);
+    })
+    .catch(error => {
+        console.error('Error al guardar el paciente en la base de datos:', error);
+    });
+}
+
 function mostrarFormularioPago() {
     const contenidoPrincipal = document.getElementById("contenidoPrincipal");
     const formHTML = `
@@ -1275,7 +1318,7 @@ function mostrarMenuPrincipal() {
     const contenidoPrincipal = document.getElementById("contenidoPrincipal");
     const menuHTML = `
         <div class="text-center animated fadeIn">
-            <h1>Bienvenido a FloreceSanando</h1>
+            <h1 class="animated-text">Bienvenido a FloreceSanando</h1>
             <p>Seleccione una opción del menú para comenzar.</p>
             <div class="d-flex justify-content-center mb-4">
                 <button class="btn btn-menu mx-2 animated bounceIn" id="btnNuevoPaciente">Nuevo Paciente</button>
@@ -1393,6 +1436,7 @@ function mostrarConfiguracion() {
         <div class="text-center animated fadeIn">
             <h1>Configuración</h1>
             <form id="configuracionForm">
+                <!-- Personalización de la Interfaz de Usuario -->
                 <div class="mb-3">
                     <label for="tipoFuente" class="form-label">Tipo de Fuente</label>
                     <select class="form-select" id="tipoFuente">
@@ -1432,6 +1476,72 @@ function mostrarConfiguracion() {
                     <label for="colorPlataforma" class="form-label">Color de la Plataforma</label>
                     <input type="color" class="form-control" id="colorPlataforma" value="#ADD8E6">
                 </div>
+
+                <!-- Preferencias de Usuario -->
+                <div class="mb-3">
+                    <label for="idioma" class="form-label">Idioma</label>
+                    <select class="form-select" id="idioma">
+                        <option value="es">Español</option>
+                        <option value="en">Inglés</option>
+                        <!-- Agrega más opciones de idioma según sea necesario -->
+                    </select>
+                </div>
+                <div class="mb-3">
+                    <label for="zonaHoraria" class="form-label">Zona Horaria</label>
+                    <select class="form-select" id="zonaHoraria">
+                        <option value="GMT-5">GMT-5</option>
+                        <option value="GMT-6">GMT-6</option>
+                        <!-- Agrega más opciones de zona horaria según sea necesario -->
+                    </select>
+                </div>
+                <div class="mb-3">
+                    <label for="formatoFecha" class="form-label">Formato de Fecha</label>
+                    <select class="form-select" id="formatoFecha">
+                        <option value="DD/MM/YYYY">DD/MM/YYYY</option>
+                        <option value="MM/DD/YYYY">MM/DD/YYYY</option>
+                    </select>
+                </div>
+
+                <!-- Configuración de Seguridad -->
+                <div class="mb-3">
+                    <label for="cambiarContrasena" class="form-label">Cambiar Contraseña</label>
+                    <input type="password" class="form-control" id="cambiarContrasena">
+                </div>
+                <div class="mb-3">
+                    <label for="autenticacionDosFactores" class="form-label">Autenticación de Dos Factores</label>
+                    <input type="checkbox" id="autenticacionDosFactores">
+                </div>
+
+                <!-- Preferencias de Notificaciones -->
+                <div class="mb-3">
+                    <label for="notificacionesEmail" class="form-label">Notificaciones por Correo Electrónico</label>
+                    <input type="checkbox" id="notificacionesEmail">
+                </div>
+                <div class="mb-3">
+                    <label for="notificacionesSMS" class="form-label">Notificaciones por SMS</label>
+                    <input type="checkbox" id="notificacionesSMS">
+                </div>
+
+                <!-- Configuración de Pagos -->
+                <div class="mb-3">
+                    <label for="metodoPago" class="form-label">Método de Pago Preferido</label>
+                    <select class="form-select" id="metodoPago">
+                        <option value="tarjetaCredito">Tarjeta de Crédito</option>
+                        <option value="paypal">PayPal</option>
+                        <!-- Agrega más opciones de método de pago según sea necesario -->
+                    </select>
+                </div>
+
+                <!-- Accesibilidad -->
+                <div class="mb-3">
+                    <label for="modoAltoContraste" class="form-label">Modo de Alto Contraste</label>
+                    <input type="checkbox" id="modoAltoContraste">
+                </div>
+                <div class="mb-3">
+                    <label for="tamanoTextoAjustable" class="form-label">Tamaño de Texto Ajustable</label>
+                    <input type="checkbox" id="tamanoTextoAjustable">
+                </div>
+
                 <button type="button" class="btn btn-primary" onclick="guardarConfiguracion()">Guardar Configuración</button>
             </form>
         </div>
@@ -1448,14 +1558,35 @@ function guardarConfiguracion() {
     const colorFuente = document.getElementById('colorFuente').value;
     const modoTema = document.getElementById('modoTema').value;
     const colorPlataforma = document.getElementById('colorPlataforma').value;
+    const idioma = document.getElementById('idioma').value;
+    const zonaHoraria = document.getElementById('zonaHoraria').value;
+    const formatoFecha = document.getElementById('formatoFecha').value;
+    const cambiarContrasena = document.getElementById('cambiarContrasena').value;
+    const autenticacionDosFactores = document.getElementById('autenticacionDosFactores').checked;
+    const notificacionesEmail = document.getElementById('notificacionesEmail').checked;
+    const notificacionesSMS = document.getElementById('notificacionesSMS').checked;
+    const metodoPago = document.getElementById('metodoPago').value;
+    const modoAltoContraste = document.getElementById('modoAltoContraste').checked;
 
-    localStorage.setItem('tipoFuente', tipoFuente);
-    localStorage.setItem('tamanoFuente', tamanoFuente);
-    localStorage.setItem('colorFuente', colorFuente);
-    localStorage.setItem('modoTema', modoTema);
-    localStorage.setItem('colorPlataforma', colorPlataforma);
+    const paciente = {
+        tipoFuente,
+        tamanoFuente,
+        colorFuente,
+        modoTema,
+        colorPlataforma,
+        idioma,
+        zonaHoraria,
+        formatoFecha,
+        cambiarContrasena,
+        autenticacionDosFactores,
+        notificacionesEmail,
+        notificacionesSMS,
+        metodoPago,
+        modoAltoContraste
+    };
 
-    aplicarConfiguracion();
+    guardarPacienteEnLocalStorage(paciente);
+    guardarPacienteEnBaseDeDatos(paciente);
 }
 
 function cargarConfiguracion() {
@@ -1464,12 +1595,32 @@ function cargarConfiguracion() {
     const colorFuente = localStorage.getItem('colorFuente') || '#000000';
     const modoTema = localStorage.getItem('modoTema') || 'claro';
     const colorPlataforma = localStorage.getItem('colorPlataforma') || '#ADD8E6';
+    const idioma = localStorage.getItem('idioma') || 'es';
+    const zonaHoraria = localStorage.getItem('zonaHoraria') || 'GMT-5';
+    const formatoFecha = localStorage.getItem('formatoFecha') || 'DD/MM/YYYY';
+    const cambiarContrasena = localStorage.getItem('cambiarContrasena') || '';
+    const autenticacionDosFactores = localStorage.getItem('autenticacionDosFactores') === 'true';
+    const notificacionesEmail = localStorage.getItem('notificacionesEmail') === 'true';
+    const notificacionesSMS = localStorage.getItem('notificacionesSMS') === 'true';
+    const metodoPago = localStorage.getItem('metodoPago') || 'tarjetaCredito';
+    const modoAltoContraste = localStorage.getItem('modoAltoContraste') === 'true';
+    const tamanoTextoAjustable = localStorage.getItem('tamanoTextoAjustable') === 'true';
 
     document.getElementById('tipoFuente').value = tipoFuente;
     document.getElementById('tamanoFuente').value = tamanoFuente;
     document.getElementById('colorFuente').value = colorFuente;
     document.getElementById('modoTema').value = modoTema;
     document.getElementById('colorPlataforma').value = colorPlataforma;
+    document.getElementById('idioma').value = idioma;
+    document.getElementById('zonaHoraria').value = zonaHoraria;
+    document.getElementById('formatoFecha').value = formatoFecha;
+    document.getElementById('cambiarContrasena').value = cambiarContrasena;
+    document.getElementById('autenticacionDosFactores').checked = autenticacionDosFactores;
+    document.getElementById('notificacionesEmail').checked = notificacionesEmail;
+    document.getElementById('notificacionesSMS').checked = notificacionesSMS;
+    document.getElementById('metodoPago').value = metodoPago;
+    document.getElementById('modoAltoContraste').checked = modoAltoContraste;
+    document.getElementById('tamanoTextoAjustable').checked = tamanoTextoAjustable;
 
     aplicarConfiguracion();
 }
@@ -1480,91 +1631,154 @@ function aplicarConfiguracion() {
     const colorFuente = localStorage.getItem('colorFuente') || '#000000';
     const modoTema = localStorage.getItem('modoTema') || 'claro';
     const colorPlataforma = localStorage.getItem('colorPlataforma') || '#ADD8E6';
+    const idioma = localStorage.getItem('idioma') || 'es';
+    const zonaHoraria = localStorage.getItem('zonaHoraria') || 'GMT-5';
+    const formatoFecha = localStorage.getItem('formatoFecha') || 'DD/MM/YYYY';
+    const autenticacionDosFactores = localStorage.getItem('autenticacionDosFactores') === 'true';
+    const notificacionesEmail = localStorage.getItem('notificacionesEmail') === 'true';
+    const notificacionesSMS = localStorage.getItem('notificacionesSMS') === 'true';
+    const metodoPago = localStorage.getItem('metodoPago') || 'tarjetaCredito';
+    const modoAltoContraste = localStorage.getItem('modoAltoContraste') === 'true';
+    const tamanoTextoAjustable = localStorage.getItem('tamanoTextoAjustable') === 'true';
 
     document.body.style.fontFamily = tipoFuente;
     document.body.style.fontSize = `${tamanoFuente}px`;
     document.body.style.color = colorFuente;
 
     if (modoTema === 'oscuro') {
-        document.body.style.backgroundColor = '#333';
-        document.body.style.color = '#fff';
+        document.body.classList.add('dark-mode');
     } else {
-        document.body.style.backgroundColor = '#fff';
-        document.body.style.color = '#000';
+        document.body.classList.remove('dark-mode');
     }
 
-    const navbar = document.querySelector('.navbar');
-    if (navbar) {
-        navbar.style.backgroundColor = colorPlataforma;
-    }
+    document.body.style.backgroundColor = colorPlataforma;
+
+    // Aplica otras configuraciones según sea necesario
 }
+
+document.addEventListener('DOMContentLoaded', function() {
+    const configuracionBtn = document.getElementById('configuracion');
+    if (configuracionBtn) {
+        configuracionBtn.addEventListener('click', function(event) {
+            event.preventDefault();
+            mostrarConfiguracion();
+        });
+    }
+
+    const ayudaBtn = document.getElementById('ayuda');
+    if (ayudaBtn) {
+        ayudaBtn.addEventListener('click', function(event) {
+            event.preventDefault();
+            mostrarManualUsuario();
+        });
+    }
+
+    // Aplicar configuración al cargar la página
+    aplicarConfiguracion();
+});
 
 function mostrarManualUsuario() {
     const contenidoPrincipal = document.getElementById("contenidoPrincipal");
     const manualHTML = `
         <div class="manual-usuario">
-            <h1>Manual de Usuario FloreceSanando</h1>
+            <h1>📘 Manual de Usuario</h1>
+            <h2>👋 Introducción</h2>
             <p>Bienvenido al manual de usuario de FloreceSanando. Aquí encontrarás toda la información necesaria para utilizar la plataforma de manera efectiva.</p>
             
-            <h2>1. Nuevo Paciente</h2>
-            <p>Esta sección te permite registrar un nuevo paciente en la plataforma.</p>
-            <img src="screenshots/nuevo_paciente.png" alt="Nuevo Paciente" class="img-fluid">
-            <p><strong>Pasos:</strong></p>
+            <h2>📂 Secciones</h2>
+            <ul>
+                <li><strong>🆕 Nuevo Paciente:</strong> Permite registrar un nuevo paciente en la plataforma.</li>
+                <li><strong>👥 Pacientes:</strong> Muestra la lista de pacientes registrados.</li>
+                <li><strong>📊 Reportes:</strong> Permite generar y visualizar reportes de los pacientes.</li>
+                <li><strong>💳 Pagos:</strong> Permite gestionar los pagos realizados por los pacientes.</li>
+            </ul>
+            
+            <h2>🆕 Nuevo Paciente</h2>
+            <p>Para registrar un nuevo paciente, sigue estos pasos:</p>
             <ol>
-                <li>Haz clic en "Nuevo Paciente".</li>
-                <li>Rellena el formulario con la información del paciente.</li>
-                <li>Haz clic en "Guardar" para registrar al paciente.</li>
+                <li>Haz clic en el botón "Nuevo Paciente" en el menú principal.</li>
+                <li>Se abrirá un formulario donde deberás ingresar la siguiente información del paciente:
+                    <ul>
+                        <li><strong>Nombre Completo:</strong> Ingresa el nombre completo del paciente.</li>
+                        <li><strong>RUT:</strong> Ingresa el RUT del paciente (9 dígitos sin el dígito verificador).</li>
+                        <li><strong>Género:</strong> Selecciona el género del paciente (Masculino, Femenino, Prefiero no mencionar).</li>
+                        <li><strong>Edad:</strong> Ingresa la edad del paciente.</li>
+                        <li><strong>Fecha de Nacimiento:</strong> Selecciona la fecha de nacimiento del paciente.</li>
+                        <li><strong>Diagnóstico de Ingreso:</strong> Ingresa el diagnóstico de ingreso del paciente.</li>
+                        <li><strong>Nacionalidad:</strong> Selecciona la nacionalidad del paciente.</li>
+                        <li><strong>Email:</strong> Ingresa el correo electrónico del paciente.</li>
+                        <li><strong>Estado Civil:</strong> Selecciona el estado civil del paciente (Soltero/a, Casado/a, Viudo/a).</li>
+                        <li><strong>Observación Inicial:</strong> Ingresa cualquier observación inicial relevante sobre el paciente.</li>
+                    </ul>
+                </li>
+                <li>Una vez completado el formulario, haz clic en el botón "Guardar Paciente" para registrar la información en la plataforma.</li>
             </ol>
-
-            <h2>2. Pacientes</h2>
-            <p>Esta sección te permite ver y gestionar la lista de pacientes registrados.</p>
-            <img src="screenshots/pacientes.png" alt="Pacientes" class="img-fluid">
-            <p><strong>Pasos:</strong></p>
+            
+            <h2>👥 Pacientes</h2>
+            <p>Para ver la lista de pacientes registrados, sigue estos pasos:</p>
             <ol>
-                <li>Haz clic en "Pacientes".</li>
-                <li>Verás una lista de todos los pacientes registrados.</li>
-                <li>Puedes editar o eliminar un paciente haciendo clic en los botones correspondientes.</li>
+                <li>Haz clic en el botón "Pacientes" en el menú principal.</li>
+                <li>Se mostrará una tabla con la información de todos los pacientes registrados, incluyendo:
+                    <ul>
+                        <li>Nombre Completo</li>
+                        <li>RUT</li>
+                        <li>Género</li>
+                        <li>Edad</li>
+                        <li>Fecha de Nacimiento</li>
+                        <li>Diagnóstico de Ingreso</li>
+                        <li>Nacionalidad</li>
+                        <li>Email</li>
+                        <li>Estado Civil</li>
+                        <li>Observación Inicial</li>
+                        <li>Prioridad</li>
+                    </ul>
+                </li>
+                <li>Puedes hacer clic en el nombre de un paciente para ver más detalles o realizar acciones adicionales como:
+                    <ul>
+                        <li><strong>Editar:</strong> Modificar la información del paciente.</li>
+                        <li><strong>Eliminar:</strong> Eliminar el registro del paciente.</li>
+                        <li><strong>Agregar Observación:</strong> Añadir nuevas observaciones sobre el paciente.</li>
+                    </ul>
+                </li>
             </ol>
-
-            <h2>3. Reportes</h2>
-            <p>Esta sección te permite generar y ver reportes de los pacientes.</p>
-            <img src="screenshots/reportes.png" alt="Reportes" class="img-fluid">
-            <p><strong>Pasos:</strong></p>
+            
+            <h2>📊 Reportes</h2>
+            <p>Para generar y visualizar reportes de los pacientes, sigue estos pasos:</p>
             <ol>
-                <li>Haz clic en "Reportes".</li>
-                <li>Selecciona el tipo de reporte que deseas generar.</li>
-                <li>Haz clic en "Generar" para ver el reporte.</li>
+                <li>Haz clic en el botón "Reportes" en el menú principal.</li>
+                <li>Se mostrará una lista de pacientes con reportes disponibles.</li>
+                <li>Haz clic en el botón "Ver Reporte" junto al paciente deseado para ver el reporte detallado.</li>
+                <li>Puedes generar nuevos reportes o eliminar reportes existentes según sea necesario.</li>
             </ol>
-
-            <h2>4. Pagos</h2>
-            <p>Esta sección te permite gestionar los pagos de los pacientes.</p>
-            <img src="screenshots/pagos.png" alt="Pagos" class="img-fluid">
-            <p><strong>Pasos:</strong></p>
+            
+            <h2>💳 Pagos</h2>
+            <p>Para gestionar los pagos realizados por los pacientes, sigue estos pasos:</p>
             <ol>
-                <li>Haz clic en "Pagos".</li>
-                <li>Verás una lista de todos los pagos registrados.</li>
-                <li>Puedes registrar un nuevo pago haciendo clic en "Nuevo Pago".</li>
+                <li>Haz clic en el botón "Pagos" en el menú principal.</li>
+                <li>Se mostrará una tabla con la información de todos los pagos registrados, incluyendo:
+                    <ul>
+                        <li>RUT del Paciente</li>
+                        <li>Fecha del Pago</li>
+                        <li>Monto</li>
+                        <li>Método de Pago</li>
+                        <li>Estado</li>
+                    </ul>
+                </li>
+                <li>Puedes registrar un nuevo pago haciendo clic en el botón "Registrar Pago" y rellenando el formulario correspondiente con la siguiente información:
+                    <ul>
+                        <li><strong>RUT del Paciente:</strong> Ingresa el RUT del paciente que realiza el pago.</li>
+                        <li><strong>Fecha del Pago:</strong> Selecciona la fecha en que se realizó el pago.</li>
+                        <li><strong>Monto:</strong> Ingresa el monto del pago.</li>
+                        <li><strong>Método de Pago:</strong> Selecciona el método de pago utilizado (Tarjeta de Crédito, PayPal, etc.).</li>
+                        <li><strong>Estado:</strong> Selecciona el estado del pago (Pagado, Pendiente, etc.).</li>
+                    </ul>
+                </li>
+                <li>Haz clic en el botón "Guardar Pago" para registrar la información del pago en la plataforma.</li>
+                <li>Puedes generar recibos de pago o eliminar pagos existentes según sea necesario.</li>
             </ol>
-
-            <h2>5. Configuración</h2>
-            <p>Esta sección te permite personalizar las opciones gráficas de la plataforma.</p>
-            <img src="screenshots/configuracion.png" alt="Configuración" class="img-fluid">
-            <p><strong>Pasos:</strong></p>
-            <ol>
-                <li>Haz clic en "Configuración".</li>
-                <li>Selecciona las opciones gráficas que deseas personalizar.</li>
-                <li>Haz clic en "Guardar Configuración" para aplicar los cambios.</li>
-            </ol>
-
-            <h2>6. Test</h2>
-            <p>Esta sección te permite realizar tests a los pacientes.</p>
-            <img src="screenshots/test.png" alt="Test" class="img-fluid">
-            <p><strong>Pasos:</strong></p>
-            <ol>
-                <li>Haz clic en "Test".</li>
-                <li>Selecciona el test que deseas realizar.</li>
-                <li>Haz clic en "Iniciar Test" para comenzar.</li>
-            </ol>
+            
+            <h2>📞 Contacto</h2>
+            <p>Si tienes alguna duda o necesitas asistencia, por favor contacta con nuestro equipo de soporte a través del siguiente correo electrónico: soporte@florecesanando.com.</p>
         </div>
     `;
     contenidoPrincipal.innerHTML = manualHTML;
